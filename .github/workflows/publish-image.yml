@@ -46,8 +46,7 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=tag
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha
 
       - name: Build and push Docker image
         id: push
@@ -86,7 +85,7 @@ jobs:
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           else
-            echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "tag=${GITHUB_SHA:0:7}" >> $GITHUB_OUTPUT
           fi
 
       - name: Checkout server-one repository
