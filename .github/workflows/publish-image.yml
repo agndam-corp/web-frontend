@@ -46,7 +46,7 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=tag
-            type=sha,format=short
+            type=sha,format=short,prefix=
 
       - name: Build and push Docker image
         id: push
