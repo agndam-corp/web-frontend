@@ -1,4 +1,4 @@
-name: Publish Docker Image to GHCR
+name: Publish Docker Image of Webapp Frontend to GHCR
 
 on:
   push:
@@ -101,12 +101,13 @@ jobs:
       - name: Commit and push changes
         run: |
           cd server-one
-          git config --local user.email \"action@github.com\"
-          git config --local user.name \"GitHub Action\"
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           git add apps/webapp/frontend/kustomization.yaml
           if git diff --staged --quiet; then
-            echo \"No changes to commit\"
+            echo "No changes to commit"
           else
-            git commit -m \"Update webapp-frontend image tag to ${{ steps.image-tag.outputs.tag }}\"
+            COMMIT_MSG="Update webapp-frontend image tag to ${{ steps.image-tag.outputs.tag }}"
+            git commit -m "$COMMIT_MSG"
             git push
           fi
