@@ -74,11 +74,6 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Install yq
-        run: |
-          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-          sudo chmod +x /usr/local/bin/yq
-
       - name: Get image tag
         id: image-tag
         run: |
@@ -100,8 +95,8 @@ jobs:
           cd server-one/apps/webapp/frontend
           NEW_TAG="${{ steps.image-tag.outputs.tag }}"
           
-          # Update the newTag value for the specific image in the kustomization.yaml
-          yq eval '.images |= map(if .name == "ghcr.io/agndam-corp/web-frontend" then .newTag = env(NEW_TAG) else . end)' -i kustomization.yaml
+          # Update the newTag value for the specific image in the kustomization.yaml using sed
+          sed -i "s/newTag: .*/newTag: $NEW_TAG/" kustomization.yaml
 
       - name: Commit and push changes
         run: |
