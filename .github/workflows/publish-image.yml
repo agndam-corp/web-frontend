@@ -102,7 +102,7 @@ jobs:
           NEW_TAG="${{ steps.image-tag.outputs.tag }}"
           
           # Update the newTag value for the specific image in the kustomization.yaml
-          yq -i \"(.images[] | select(.name == \\\"ghcr.io/damianjaskolski95/webapp-frontend\\\")).newTag = \\\"$NEW_TAG\\\"\" kustomization.yaml
+          yq eval "(.images[] | select(.name == \"ghcr.io/damianjaskolski95/webapp-frontend\")).newTag = \"$NEW_TAG\"" -i kustomization.yaml
 
       - name: Commit and push changes
         run: |
