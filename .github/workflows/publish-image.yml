@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: agndam-corp/web-frontend
 
 jobs:
   build-and-push-image:
@@ -98,10 +98,10 @@ jobs:
       - name: Update image tag in kustomization.yaml
         run: |
           cd server-one/apps/webapp/frontend
-          NEW_TAG="${{ steps.image-tag.outputs.tag }}"
+          NEW_TAG=\"${{ steps.image-tag.outputs.tag }}\"
           
           # Update the newTag value for the specific image in the kustomization.yaml
-          yq eval \"(.images[] | select(.name == \\\"ghcr.io/agndam-corp/web-frontend\\\")).newTag = \\\"$NEW_TAG\\\"\" -i kustomization.yaml
+          yq eval \"(.images[] | select(.name == \\\"ghcr.io/agndam-corp/web-frontend\\\")).newTag = strenv(NEW_TAG)\" -i kustomization.yaml
 
       - name: Commit and push changes
         run: |
