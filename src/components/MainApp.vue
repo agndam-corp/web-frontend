@@ -121,7 +121,7 @@ export default {
     },
     async refreshStatus() {
       try {
-        const response = await axios.get('https://api.djasko.com/status')
+        const response = await axios.get('/status')
         this.status = response.data.state
         this.message = ''
       } catch (error) {
@@ -131,7 +131,7 @@ export default {
     },
     async startInstance() {
       try {
-        await axios.post('https://api.djasko.com/start')
+        await axios.post('/start')
         this.message = 'Start command sent successfully'
         this.messageType = 'success'
         // Refresh status after a short delay
@@ -143,7 +143,7 @@ export default {
     },
     async stopInstance() {
       try {
-        await axios.post('https://api.djasko.com/stop')
+        await axios.post('/stop')
         this.message = 'Stop command sent successfully'
         this.messageType = 'success'
         // Refresh status after a short delay

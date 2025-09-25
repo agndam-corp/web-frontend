@@ -128,15 +128,9 @@ export default {
       
       try {
         // Send credentials to login endpoint to get JWT token
-        const response = await fetch('https://api.djasko.com/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: this.username,
-            password: this.password
-          })
+        const response = await axios.post('/login', {
+          username: this.username,
+          password: this.password
         })
         
         console.log('Login response status:', response.status)
@@ -170,8 +164,7 @@ export default {
   }
 }
 
-// Add axios import and configuration to make it available in the component
-import axios from 'axios'
+
 </script>
 
 <style scoped>
