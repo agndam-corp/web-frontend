@@ -86,6 +86,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   data() {
     return {
@@ -134,7 +136,7 @@ export default {
       
       try {
         // Send credentials to login endpoint to get JWT token
-        const response = await this.$http.post('/login', {
+        const response = await axios.post('/login', {
           username: this.username,
           password: this.password
         }, {

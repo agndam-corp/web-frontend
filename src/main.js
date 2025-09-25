@@ -4,13 +4,6 @@ import App from './App.vue'
 import router from './router.js'
 import axios from 'axios'
 
-// Set base URL for API requests (adjust as needed for your deployment)
-// In production, this would typically be the backend service endpoint
-const app = createApp(App)
-
-// Make axios available globally
-app.config.globalProperties.$http = axios
-
 // Set up axios to include JWT token in requests if available
 axios.defaults.baseURL = window.location.origin  // Use the same origin as the frontend
 
@@ -36,6 +29,7 @@ axios.interceptors.response.use(
       // Token might be expired or invalid, redirect to login
       localStorage.removeItem('token')
       localStorage.removeItem('role')
+      localStorage.removeItem('username')
       window.location.href = '/login'
     }
     return Promise.reject(error)
