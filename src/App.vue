@@ -1,6 +1,6 @@
 <template>
   <div id="app" :class="themeClass">
-    <Login v-if="!isAuthenticated" />
+    <Login v-if="!isAuthenticated" @login-success="onLoginSuccess" />
     <MainApp v-else :theme="theme" @theme-changed="changeTheme" />
   </div>
 </template>
@@ -40,6 +40,10 @@ export default {
     }
   },
   methods: {
+    onLoginSuccess(loginData) {
+      // Set the authentication status and potentially other data
+      this.isAuthenticated = true
+    },
     changeTheme(newTheme) {
       this.theme = newTheme
       localStorage.setItem('theme', newTheme)

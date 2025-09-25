@@ -85,8 +85,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   props: {
     theme: {
@@ -107,11 +105,6 @@ export default {
     }
   },
   mounted() {
-    // Set up axios with JWT token
-    const token = localStorage.getItem('token')
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-    }
     this.refreshStatus()
   },
   methods: {
@@ -121,7 +114,7 @@ export default {
     },
     async refreshStatus() {
       try {
-        const response = await axios.get('/status')
+        const response = await this.$http.get('/status')
         this.status = response.data.state
         this.message = ''
       } catch (error) {
@@ -131,7 +124,7 @@ export default {
     },
     async startInstance() {
       try {
-        await axios.post('/start')
+        await this.$http.post('/start')
         this.message = 'Start command sent successfully'
         this.messageType = 'success'
         // Refresh status after a short delay
@@ -143,7 +136,7 @@ export default {
     },
     async stopInstance() {
       try {
-        await axios.post('/stop')
+        await this.$http.post('/stop')
         this.message = 'Stop command sent successfully'
         this.messageType = 'success'
         // Refresh status after a short delay
@@ -157,8 +150,7 @@ export default {
       // Remove JWT token and role
       localStorage.removeItem('token')
       localStorage.removeItem('role')
-      // Remove authorization header from axios
-      delete axios.defaults.headers.common['Authorization']
+      localStorage.removeItem('username')
       // Reload page to return to login
       window.location.reload()
     }

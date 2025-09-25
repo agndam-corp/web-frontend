@@ -2,13 +2,13 @@
   <div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8" :class="themeClass">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <h2 class="mt-6 text-center text-3xl font-extrabold" :class="textClass">
-        Sign in to Control Panel
+        Create an Account
       </h2>
     </div>
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
       <div class="py-8 px-4 shadow sm:rounded-lg sm:px-10" :class="cardClass">
-        <form class="space-y-6" @submit.prevent="login">
+        <form class="space-y-6" @submit.prevent="register">
           <div>
             <label for="username" class="block text-sm font-medium" :class="labelClass">
               Username
@@ -18,9 +18,26 @@
                 id="username"
                 name="username"
                 type="text"
-                autocomplete="username"
                 required
                 v-model="username"
+                class="appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                :class="inputClass"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="email" class="block text-sm font-medium" :class="labelClass">
+              Email
+            </label>
+            <div class="mt-1">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                required
+                v-model="email"
                 class="appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 :class="inputClass"
               />
@@ -36,9 +53,27 @@
                 id="password"
                 name="password"
                 type="password"
-                autocomplete="current-password"
+                autocomplete="new-password"
                 required
                 v-model="password"
+                class="appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                :class="inputClass"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="confirmPassword" class="block text-sm font-medium" :class="labelClass">
+              Confirm Password
+            </label>
+            <div class="mt-1">
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                autocomplete="new-password"
+                required
+                v-model="confirmPassword"
                 class="appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 :class="inputClass"
               />
@@ -67,17 +102,18 @@
               class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50"
               :class="buttonClass"
             >
-              <span v-if="loading">Signing in...</span>
-              <span v-else>Sign in</span>
+              <span v-if="loading">Creating account...</span>
+              <span v-else>Create Account</span>
             </button>
           </div>
         </form>
+        
         <div class="mt-4 text-center">
           <p class="text-sm">
-            Don't have an account?
-            <a href="/register" class="font-medium" :class="theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-500'">
-              Register here
-            </a>
+            Already have an account?
+            <router-link to="/login" class="font-medium" :class="theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-500'">
+              Sign in
+            </router-link>
           </p>
         </div>
       </div>
@@ -86,11 +122,16 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
+  name: 'Registration',
   data() {
     return {
       username: '',
+      email: '',
       password: '',
+      confirmPassword: '',
       error: '',
       loading: false
     }
@@ -128,45 +169,48 @@ export default {
     }
   },
   methods: {
-    async login() {
+    async register() {
+      // Simple validation
+      if (this.password !== this.confirmPassword) {
+        this.error = 'Passwords do not match'
+        return
+      }
+      
+      if (this.password.length < 6) {
+        this.error = 'Password must be at least 6 characters'
+        return
+      }
+
       this.loading = true
       this.error = ''
       
       try {
-        // Send credentials to login endpoint to get JWT token
-        const response = await this.$http.post('/login', {
+        const response = await axios.post('/register', {
           username: this.username,
+          email: this.email,
           password: this.password
-        }, {
-          // Explicitly set headers if needed
-          headers: {
-            'Content-Type': 'application/json'
-          }
         })
         
-        // Store JWT token in localStorage
-        localStorage.setItem('token', response.data.token)
-        // Also store user role and username
-        localStorage.setItem('role', response.data.role)
-        localStorage.setItem('username', response.data.username)
-        
-        // Emit an event to notify parent component of successful login
-        this.$emit('login-success', {
-          token: response.data.token,
-          role: response.data.role,
-          username: response.data.username
-        })
+        if (response.status === 200) {
+          this.error = ''
+          // Show success message and redirect to login after a delay
+          this.error = 'Account created successfully! Redirecting to login...'
+          setTimeout(() => {
+            this.$router.push('/login')
+          }, 2000)
+        } else {
+          this.error = response.data.error || `Registration failed (${response.status})`
+        }
       } catch (err) {
-        console.error('Login error:', err)
         if (err.response) {
           // Server responded with error status
-          this.error = err.response.data.error || `Login failed (${err.response.status})`
+          this.error = err.response.data.error || `Registration failed (${err.response.status})`
         } else if (err.request) {
           // Request was made but no response received
           this.error = 'Network error - unable to reach the server'
         } else {
           // Something else happened
-          this.error = 'An error occurred during login: ' + err.message
+          this.error = 'An error occurred during registration: ' + err.message
         }
       } finally {
         this.loading = false
