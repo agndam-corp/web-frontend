@@ -107,10 +107,10 @@ export default {
     }
   },
   mounted() {
-    // Set up axios with basic auth credentials
-    const auth = localStorage.getItem('auth')
-    if (auth) {
-      axios.defaults.headers.common['Authorization'] = `Basic ${auth}`
+    // Set up axios with JWT token
+    const token = localStorage.getItem('token')
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
     }
     this.refreshStatus()
   },
@@ -154,8 +154,12 @@ export default {
       }
     },
     logout() {
-      // Remove auth credentials and reload page
-      localStorage.removeItem('auth')
+      // Remove JWT token and role
+      localStorage.removeItem('token')
+      localStorage.removeItem('role')
+      // Remove authorization header from axios
+      delete axios.defaults.headers.common['Authorization']
+      // Reload page to return to login
       window.location.reload()
     }
   }

@@ -78,6 +78,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   data() {
     return {
@@ -125,32 +127,38 @@ export default {
       this.error = ''
       
       try {
-        // Encode credentials for basic auth
-        const credentials = btoa(`${this.username}:${this.password}`)
-        
-        // Test credentials by making a request to the auth-check endpoint
-        const response = await fetch('https://api.djasko.com/auth-check', {
-          method: 'GET',
+        // Send credentials to login endpoint to get JWT token
+        const response = await fetch('https://api.djasko.com/login', {
+          method: 'POST',
           headers: {
-            'Authorization': `Basic ${credentials}`,
             'Content-Type': 'application/json'
-          }
+          },
+          body: JSON.stringify({
+            username: this.username,
+            password: this.password
+          })
         })
         
         console.log('Login response status:', response.status)
-        console.log('Login response headers:', [...response.headers.entries()])
         
         if (response.ok) {
-          // Store credentials in localStorage
-          localStorage.setItem('auth', credentials)
+          const data = await response.json()
+          // Store JWT token in localStorage
+          localStorage.setItem('token', data.token)
+          // Also store user role
+          localStorage.setItem('role', data.role)
+          
+          // Set up axios with the token
+          axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
+          
           // Manually trigger authentication state change
           this.$parent.isAuthenticated = true
           // Redirect to main app
           this.$router.push('/')
         } else {
-          const errorText = await response.text()
-          console.log('Login error response:', errorText)
-          this.error = `Invalid credentials (${response.status})`
+          const errorData = await response.json()
+          console.log('Login error response:', errorData)
+          this.error = errorData.error || `Login failed (${response.status})`
         }
       } catch (err) {
         console.error('Login error:', err)
@@ -161,6 +169,9 @@ export default {
     }
   }
 }
+
+// Add axios import and configuration to make it available in the component
+import axios from 'axios'
 </script>
 
 <style scoped>

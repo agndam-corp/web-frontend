@@ -27,9 +27,9 @@ export default {
     }
   },
   mounted() {
-    // Check if user is already authenticated
-    const auth = localStorage.getItem('auth')
-    if (auth) {
+    // Check if user is already authenticated via JWT token
+    const token = localStorage.getItem('token')
+    if (token) {
       this.isAuthenticated = true
     }
     
