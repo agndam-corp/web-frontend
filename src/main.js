@@ -5,7 +5,8 @@ import router from './router.js'
 import axios from 'axios'
 
 // Set up axios to include JWT token in requests if available
-axios.defaults.baseURL = window.location.origin  // Use the same origin as the frontend
+// Point to the backend API URL
+axios.defaults.baseURL = 'https://api.djasko.com'  // Backend API endpoint
 
 // Add a request interceptor to include the JWT token
 axios.interceptors.request.use(
