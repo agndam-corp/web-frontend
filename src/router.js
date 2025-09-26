@@ -28,14 +28,14 @@ const router = createRouter({
 
 // Navigation guard to protect routes
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
+  const accessToken = localStorage.getItem('access_token')
   
   // If trying to access main app without auth, redirect to login
-  if (to.name === 'MainApp' && !token) {
+  if (to.name === 'MainApp' && !accessToken) {
     next({ name: 'Login' })
   } 
   // If trying to access login while authenticated and going to root, redirect to main app
-  else if ((to.name === 'Login' || to.name === 'Register') && token && to.path === '/') {
+  else if ((to.name === 'Login' || to.name === 'Register') && accessToken && to.path === '/') {
     next({ name: 'MainApp' })
   } 
   // Otherwise, proceed normally

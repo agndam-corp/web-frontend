@@ -146,17 +146,24 @@ export default {
           }
         })
         
-        // Store JWT token in localStorage
-        localStorage.setItem('token', response.data.token)
-        // Also store user role and username
+        // Store JWT tokens and user info in localStorage
+        localStorage.setItem('access_token', response.data.access_token)
+        localStorage.setItem('refresh_token', response.data.refresh_token)
         localStorage.setItem('role', response.data.role)
         localStorage.setItem('username', response.data.username)
         
+        // Also store expiration time 
+        const expiresIn = response.data.expires_in || 900; // Default to 15 minutes if not provided
+        const expirationTime = new Date().getTime() + (expiresIn * 1000);
+        localStorage.setItem('token_expires_at', expirationTime.toString())
+        
         // Emit an event to notify parent component of successful login
         this.$emit('login-success', {
-          token: response.data.token,
+          access_token: response.data.access_token,
+          refresh_token: response.data.refresh_token,
           role: response.data.role,
-          username: response.data.username
+          username: response.data.username,
+          expires_in: expiresIn
         })
       } catch (err) {
         console.error('Login error:', err)

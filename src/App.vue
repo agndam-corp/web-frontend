@@ -27,9 +27,9 @@ export default {
     }
   },
   mounted() {
-    // Check if user is already authenticated via JWT token
-    const token = localStorage.getItem('token')
-    if (token) {
+    // Check if user is already authenticated via JWT access token
+    const accessToken = localStorage.getItem('access_token')
+    if (accessToken) {
       this.isAuthenticated = true
     }
     
@@ -41,8 +41,9 @@ export default {
   },
   methods: {
     onLoginSuccess(loginData) {
-      // Set the authentication status and potentially other data
+      // Set the authentication status and update any necessary data
       this.isAuthenticated = true
+      // Optionally store additional data if needed
     },
     changeTheme(newTheme) {
       this.theme = newTheme

@@ -149,12 +149,14 @@ export default {
       }
     },
     logout() {
-      // Remove JWT token and role
-      localStorage.removeItem('token')
+      // Remove all JWT tokens and user data
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
       localStorage.removeItem('role')
       localStorage.removeItem('username')
+      localStorage.removeItem('token_expires_at')
       // Reload page to return to login
-      window.location.reload()
+      window.location.href = '/login'
     }
   }
 }
