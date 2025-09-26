@@ -116,13 +116,6 @@
             </a>
           </p>
         </div>
-          <p class="text-sm">
-            Already have an account?
-            <router-link to="/login" class="font-medium" :class="theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-500'">
-              Sign in
-            </router-link>
-          </p>
-        </div>
       </div>
     </div>
   </div>
@@ -205,87 +198,6 @@ export default {
         }, 2000)
       } catch (err) {
         console.error('Registration error:', err)
-        if (err.response) {
-          // Server responded with error status
-          this.error = err.response.data.error || `Registration failed (${err.response.status})`
-        } else if (err.request) {
-          // Request was made but no response received
-          this.error = 'Network error - unable to reach the server'
-        } else {
-          // Something else happened
-          this.error = 'An error occurred during registration: ' + err.message
-        }
-      } finally {
-        this.loading = false
-      }
-    }
-  },
-  computed: {
-    theme() {
-      return localStorage.getItem('theme') || 'dark'
-    },
-    themeClass() {
-      return `theme-${this.theme}`
-    },
-    cardClass() {
-      return this.theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-    },
-    textClass() {
-      return this.theme === 'dark' ? 'text-white' : 'text-gray-900'
-    },
-    labelClass() {
-      return this.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-    },
-    inputClass() {
-      return this.theme === 'dark' ? 
-        'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 
-        'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-    },
-    errorClass() {
-      return this.theme === 'dark' ? 
-        'bg-red-900 text-red-100' : 
-        'bg-red-50 text-red-800'
-    },
-    buttonClass() {
-      return this.theme === 'dark' ? 
-        'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-gray-800' : 
-        'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-white'
-    }
-  },
-  methods: {
-    async register() {
-      // Simple validation
-      if (this.password !== this.confirmPassword) {
-        this.error = 'Passwords do not match'
-        return
-      }
-      
-      if (this.password.length < 6) {
-        this.error = 'Password must be at least 6 characters'
-        return
-      }
-
-      this.loading = true
-      this.error = ''
-      
-      try {
-        const response = await axios.post('/register', {
-          username: this.username,
-          email: this.email,
-          password: this.password
-        })
-        
-        if (response.status === 200) {
-          this.error = ''
-          // Show success message and redirect to login after a delay
-          this.error = 'Account created successfully! Redirecting to login...'
-          setTimeout(() => {
-            this.$router.push('/login')
-          }, 2000)
-        } else {
-          this.error = response.data.error || `Registration failed (${response.status})`
-        }
-      } catch (err) {
         if (err.response) {
           // Server responded with error status
           this.error = err.response.data.error || `Registration failed (${err.response.status})`
