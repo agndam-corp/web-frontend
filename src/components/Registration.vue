@@ -122,7 +122,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { authService } from '../services/authService'
 
 export default {
   data() {
@@ -184,8 +184,8 @@ export default {
       this.error = ''
 
       try {
-        // Send registration request to backend
-        await axios.post('/register', {
+        // Use the authentication service to register
+        await authService.register({
           username: this.username,
           email: this.email,
           password: this.password

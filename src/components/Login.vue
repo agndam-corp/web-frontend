@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { authService } from '../services/authService'
 
 export default {
   data() {
@@ -137,46 +137,16 @@ export default {
       console.log('Login method called with username:', this.username);
       
       try {
-        // Send credentials to login endpoint to get JWT token
-        console.log('Making login request to /login');
-        const response = await axios.post('/login', {
+        // Use the authentication service to login
+        const loginData = await authService.login({
           username: this.username,
           password: this.password
-        }, {
-          // Explicitly set headers if needed
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-        
-        console.log('Login response received:', response.data);
-        
-        // Store JWT tokens and user info in localStorage
-        localStorage.setItem('access_token', response.data.access_token)
-        localStorage.setItem('refresh_token', response.data.refresh_token)
-        localStorage.setItem('role', response.data.role)
-        localStorage.setItem('username', response.data.username)
-        
-        // Also store expiration time 
-        const expiresIn = response.data.expires_in || 900; // Default to 15 minutes if not provided
-        const expirationTime = new Date().getTime() + (expiresIn * 1000);
-        localStorage.setItem('token_expires_at', expirationTime.toString())
-        
-        console.log('Tokens stored in localStorage:', {
-          access_token: response.data.access_token ? 'exists' : 'not found',
-          refresh_token: response.data.refresh_token ? 'exists' : 'not found',
-          role: response.data.role,
-          username: response.data.username
         });
         
+        console.log('Login successful, data received:', loginData);
+        
         // Emit an event to notify parent component of successful login
-        this.$emit('login-success', {
-          access_token: response.data.access_token,
-          refresh_token: response.data.refresh_token,
-          role: response.data.role,
-          username: response.data.username,
-          expires_in: expiresIn
-        })
+        this.$emit('login-success', loginData)
       } catch (err) {
         console.error('Login error:', err)
         if (err.response) {

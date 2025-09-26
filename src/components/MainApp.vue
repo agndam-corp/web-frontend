@@ -85,7 +85,8 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { vpnService } from '../services/vpnService'
+import { authService } from '../services/authService'
 
 export default {
   props: {
@@ -116,8 +117,8 @@ export default {
     },
     async refreshStatus() {
       try {
-        const response = await axios.get('/status')
-        this.status = response.data.state
+        const response = await vpnService.getStatus()
+        this.status = response.state
         this.message = ''
       } catch (error) {
         this.message = `Error: ${error.response?.data?.error || error.message}`
@@ -126,7 +127,7 @@ export default {
     },
     async startInstance() {
       try {
-        await axios.post('/start')
+        await vpnService.startInstance()
         this.message = 'Start command sent successfully'
         this.messageType = 'success'
         // Refresh status after a short delay
@@ -138,7 +139,7 @@ export default {
     },
     async stopInstance() {
       try {
-        await axios.post('/stop')
+        await vpnService.stopInstance()
         this.message = 'Stop command sent successfully'
         this.messageType = 'success'
         // Refresh status after a short delay
@@ -149,13 +150,9 @@ export default {
       }
     },
     logout() {
-      // Remove all JWT tokens and user data
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('refresh_token')
-      localStorage.removeItem('role')
-      localStorage.removeItem('username')
-      localStorage.removeItem('token_expires_at')
-      // Reload page to return to login
+      // Use auth service to handle logout
+      authService.logout()
+      // Redirect to login
       window.location.href = '/login'
     }
   }
