@@ -24,6 +24,11 @@ export const vpnService = {
       return response.data;
     } catch (error) {
       console.error('VPN service: Get status error:', error);
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+        console.error('Response status:', error.response.status);
+        console.error('Response headers:', error.response.headers);
+      }
       throw error;
     }
   },
@@ -40,6 +45,11 @@ export const vpnService = {
       return response.data;
     } catch (error) {
       console.error('VPN service: Start instance error:', error);
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+        console.error('Response status:', error.response.status);
+        console.error('Response headers:', error.response.headers);
+      }
       throw error;
     }
   },
@@ -56,6 +66,11 @@ export const vpnService = {
       return response.data;
     } catch (error) {
       console.error('VPN service: Stop instance error:', error);
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+        console.error('Response status:', error.response.status);
+        console.error('Response headers:', error.response.headers);
+      }
       throw error;
     }
   }
