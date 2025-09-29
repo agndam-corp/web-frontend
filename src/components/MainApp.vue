@@ -154,8 +154,14 @@ export default {
   },
   methods: {
     loadUserInfo() {
-      this.username = authService.getUsername() || 'User'
-      this.role = authService.getUserRole() || 'user'
+      try {
+        this.username = authService.getUsername() || 'User'
+        this.role = authService.getUserRole() || 'user'
+      } catch (error) {
+        console.error('Error loading user info:', error)
+        this.username = 'User'
+        this.role = 'user'
+      }
     },
     
     toggleTheme() {
