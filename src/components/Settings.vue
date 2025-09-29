@@ -32,6 +32,8 @@
       <div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
         <div class="px-4 py-6 sm:px-0">
           <h2 class="text-2xl font-bold mb-6" :class="theme === 'dark' ? 'text-white' : 'text-gray-900'">Settings</h2>
+        </div>
+      </div>
       
       <!-- User Information Section -->
       <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-8">
@@ -122,41 +124,6 @@ import { authService } from '../services/authService'
 
 export default {
   name: 'Settings',
-  name: 'Settings',
-  data() {
-    return {
-      user: {}
-    }
-  },
-  async mounted() {
-    await this.loadUserInfo()
-  },
-  methods: {
-    async loadUserInfo() {
-      try {
-        // Get user info from auth service
-        this.user = {
-          username: authService.getUsername(),
-          role: authService.getUserRole(),
-          email: localStorage.getItem('user_email') || 'N/A', // Would come from API response
-          createdAt: localStorage.getItem('user_created_at') || new Date().toISOString() // Would come from API
-        }
-      } catch (error) {
-        console.error('Error loading user info:', error)
-        this.user = {
-          username: authService.getUsername(),
-          role: authService.getUserRole(),
-          email: 'N/A',
-          createdAt: 'N/A'
-        }
-      }
-    },
-    formatDate(dateString) {
-      if (!dateString) return null
-      const date = new Date(dateString)
-      return date.toLocaleDateString()
-    }
-  },
   data() {
     return {
       theme: localStorage.getItem('theme') || 'dark',
