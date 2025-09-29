@@ -1,9 +1,9 @@
 <template>
   <div class="mt-8">
-    <div class="shadow overflow-hidden sm:rounded-lg">
+    <div class="shadow overflow-hidden sm:rounded-lg" :class="theme === 'dark' ? 'bg-gray-800' : 'bg-white'">
       <div class="px-4 py-5 sm:p-6">
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-bold">AWS Instance Management</h2>
+          <h2 class="text-xl font-bold" :class="theme === 'dark' ? 'text-white' : 'text-gray-900'">AWS Instance Management</h2>
           <button
             @click="showCreateModal = true"
             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -21,24 +21,35 @@
         <div v-if="errorMessage" class="mb-4 p-4 rounded-md bg-red-50 text-red-800">
           <p>{{ errorMessage }}</p>
         </div>
+        
+        <!-- Notification message -->
+        <div v-if="message" class="mb-4 p-4 rounded-md" 
+             :class="{
+               'bg-green-50 text-green-800': messageType === 'success',
+               'bg-red-50 text-red-800': messageType === 'error',
+               'bg-yellow-50 text-yellow-800': messageType === 'warning',
+               'bg-blue-50 text-blue-800': messageType === 'info'
+             }">
+          <p>{{ message }}</p>
+        </div>
 
         <!-- Instances table -->
         <div v-if="!loading && instances.length > 0" class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+          <table class="min-w-full divide-y divide-gray-200" :class="theme === 'dark' ? 'bg-gray-800' : 'bg-white'">
+            <thead :class="theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'">
               <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Name</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Instance ID</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Region</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Actions</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" :class="theme === 'dark' ? 'text-gray-300' : 'text-gray-500'">Name</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" :class="theme === 'dark' ? 'text-gray-300' : 'text-gray-500'">Instance ID</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" :class="theme === 'dark' ? 'text-gray-300' : 'text-gray-500'">Region</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" :class="theme === 'dark' ? 'text-gray-300' : 'text-gray-500'">Status</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" :class="theme === 'dark' ? 'text-gray-300' : 'text-gray-500'">Actions</th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody :class="theme === 'dark' ? 'divide-gray-700 bg-gray-700' : 'divide-gray-200 bg-white'">
               <tr v-for="instance in instances" :key="instance.id">
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">{{ instance.name }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ instance.instanceId }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ instance.region }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ getRegionDisplayName(instance.region) }}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span 
                     class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
@@ -139,17 +150,17 @@
                 required
               >
                 <option value="">Select a region</option>
-                <option value="us-east-1">US East (N. Virginia)</option>
-                <option value="us-east-2">US East (Ohio)</option>
-                <option value="us-west-1">US West (N. California)</option>
-                <option value="us-west-2">US West (Oregon)</option>
-                <option value="eu-west-1">EU (Ireland)</option>
-                <option value="eu-west-2">EU (London)</option>
-                <option value="eu-west-3">EU (Paris)</option>
-                <option value="eu-central-1">EU (Frankfurt)</option>
-                <option value="ap-southeast-1">Asia Pacific (Singapore)</option>
-                <option value="ap-southeast-2">Asia Pacific (Sydney)</option>
-                <option value="ap-northeast-1">Asia Pacific (Tokyo)</option>
+                <option value="us-east-1">US East (N. Virginia) [us-east-1]</option>
+                <option value="us-east-2">US East (Ohio) [us-east-2]</option>
+                <option value="us-west-1">US West (N. California) [us-west-1]</option>
+                <option value="us-west-2">US West (Oregon) [us-west-2]</option>
+                <option value="eu-west-1">EU (Ireland) [eu-west-1]</option>
+                <option value="eu-west-2">EU (London) [eu-west-2]</option>
+                <option value="eu-west-3">EU (Paris) [eu-west-3]</option>
+                <option value="eu-central-1">EU (Frankfurt) [eu-central-1]</option>
+                <option value="ap-southeast-1">Asia Pacific (Singapore) [ap-southeast-1]</option>
+                <option value="ap-southeast-2">Asia Pacific (Sydney) [ap-southeast-2]</option>
+                <option value="ap-northeast-1">Asia Pacific (Tokyo) [ap-northeast-1]</option>
               </select>
             </div>
             <div class="mb-4">
@@ -224,6 +235,8 @@ export default {
       instances: [],
       loading: false,
       errorMessage: '',
+      message: '',
+      messageType: 'success',
       showCreateModal: false,
       showEditModal: false,
       showDeleteConfirm: false,
@@ -241,6 +254,23 @@ export default {
     this.loadInstances()
   },
   methods: {
+    getRegionDisplayName(regionCode) {
+      const regionMap = {
+        'us-east-1': 'US East (N. Virginia) [us-east-1]',
+        'us-east-2': 'US East (Ohio) [us-east-2]',
+        'us-west-1': 'US West (N. California) [us-west-1]',
+        'us-west-2': 'US West (Oregon) [us-west-2]',
+        'eu-west-1': 'EU (Ireland) [eu-west-1]',
+        'eu-west-2': 'EU (London) [eu-west-2]',
+        'eu-west-3': 'EU (Paris) [eu-west-3]',
+        'eu-central-1': 'EU (Frankfurt) [eu-central-1]',
+        'ap-southeast-1': 'Asia Pacific (Singapore) [ap-southeast-1]',
+        'ap-southeast-2': 'Asia Pacific (Sydney) [ap-southeast-2]',
+        'ap-northeast-1': 'Asia Pacific (Tokyo) [ap-northeast-1]'
+      };
+      return regionMap[regionCode] || regionCode;
+    },
+    
     async loadInstances() {
       this.loading = true
       this.errorMessage = ''
@@ -258,36 +288,49 @@ export default {
     
     async startInstance(instance) {
       try {
-        await awsInstanceService.startInstance(instance.instanceId, instance.region)
-        // Refresh the instance list to show updated status
-        await this.loadInstances()
+        await awsInstanceService.startInstance({ instanceId: instance.instanceId, region: instance.region })
+        this.message = `Start command sent for instance ${instance.name}`
+        this.messageType = 'success'
+        // Only refresh the specific instance status after a delay, not the whole list immediately
+        setTimeout(() => {
+          this.getStatus(instance)
+        }, 2000)
       } catch (error) {
-        this.errorMessage = `Error starting instance: ${error.response?.data?.error || error.message}`
+        this.message = `Error starting instance ${instance.name}: ${error.response?.data?.error || error.message}`
+        this.messageType = 'error'
         console.error('Error starting instance:', error)
       }
     },
     
     async stopInstance(instance) {
       try {
-        await awsInstanceService.stopInstance(instance.instanceId, instance.region)
-        // Refresh the instance list to show updated status
-        await this.loadInstances()
+        await awsInstanceService.stopInstance({ instanceId: instance.instanceId, region: instance.region })
+        this.message = `Stop command sent for instance ${instance.name}`
+        this.messageType = 'success'
+        // Only refresh the specific instance status after a delay, not the whole list immediately
+        setTimeout(() => {
+          this.getStatus(instance)
+        }, 2000)
       } catch (error) {
-        this.errorMessage = `Error stopping instance: ${error.response?.data?.error || error.message}`
+        this.message = `Error stopping instance ${instance.name}: ${error.response?.data?.error || error.message}`
+        this.messageType = 'error'
         console.error('Error stopping instance:', error)
       }
     },
     
     async getStatus(instance) {
       try {
-        const status = await awsInstanceService.getInstanceStatus(instance.instanceId, instance.region)
+        const response = await awsInstanceService.getInstanceStatus(instance.instanceId, instance.region)
         // Update the instance status in the list
         const index = this.instances.findIndex(i => i.id === instance.id)
         if (index !== -1) {
-          this.instances[index].status = status.state
+          this.instances[index].status = response.state
         }
+        this.message = `Current status for ${instance.name}: ${response.state}`
+        this.messageType = 'success'
       } catch (error) {
-        this.errorMessage = `Error getting instance status: ${error.response?.data?.error || error.message}`
+        this.message = `Error getting status for ${instance.name}: ${error.response?.data?.error || error.message}`
+        this.messageType = 'error'
         console.error('Error getting instance status:', error)
       }
     },

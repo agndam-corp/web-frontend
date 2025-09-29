@@ -145,8 +145,8 @@ export default {
         
         console.log('Login successful, data received:', loginData);
         
-        // Emit an event to notify parent component of successful login
-        this.$emit('login-success', loginData)
+        // Instead of emitting an event, redirect to main app
+        window.location.href = '/'
       } catch (err) {
         console.error('Login error:', err)
         if (err.response) {

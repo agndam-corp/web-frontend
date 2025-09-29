@@ -4,6 +4,12 @@
       <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         <h1 class="text-3xl font-bold">VPN Control Panel</h1>
         <div class="flex items-center space-x-4">
+          <router-link 
+            to="/settings"
+            class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+          >
+            Settings
+          </router-link>
           <div class="flex items-center">
             <span class="mr-2">Light</span>
             <button 
@@ -33,33 +39,47 @@
         <div class="px-4 py-6 sm:px-0">
           <div class="shadow overflow-hidden sm:rounded-lg">
             <div class="px-4 py-5 sm:p-6">
-              <h2 class="text-lg leading-6 font-medium">VPN Instance Control</h2>
+              <h2 class="text-lg leading-6 font-medium">Instance Control</h2>
               <div class="mt-4">
-                <div class="flex items-center">
+                <div class="mb-4">
+                  <label class="block text-sm font-medium">Default Instance:</label>
+                  <select 
+                    v-model="selectedInstanceId"
+                    @change="onInstanceChange"
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                    :class="theme === 'dark' ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-900 border-gray-300'"
+                  >
+                    <option value="">Select an instance</option>
+                    <option v-for="instance in instances" :key="instance.id" :value="instance.id">
+                      {{ instance.name }} ({{ instance.instanceId }})
+                    </option>
+                  </select>
+                </div>
+                <div class="flex items-center" v-if="currentInstance">
                   <span class="text-sm font-medium">Status:</span>
                   <span class="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full" 
                         :class="{
-                          'bg-green-100 text-green-800': status === 'running',
-                          'bg-red-100 text-red-800': status === 'stopped',
-                          'bg-yellow-100 text-yellow-800': status === 'pending' || status === 'stopping'
+                          'bg-green-100 text-green-800': currentInstance.status === 'running',
+                          'bg-red-100 text-red-800': currentInstance.status === 'stopped',
+                          'bg-yellow-100 text-yellow-800': currentInstance.status === 'pending' || currentInstance.status === 'stopping'
                         }">
-                    {{ status }}
+                    {{ currentInstance.status }}
                   </span>
                 </div>
                 <div class="mt-4 flex space-x-4">
                   <button 
                     @click="startInstance"
-                    :disabled="status === 'running' || status === 'pending'"
+                    :disabled="!currentInstance || currentInstance.status === 'running' || currentInstance.status === 'pending'"
                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
                   >
-                    Start VPN
+                    Start Instance
                   </button>
                   <button 
                     @click="stopInstance"
-                    :disabled="status === 'stopped' || status === 'stopping'"
+                    :disabled="!currentInstance || currentInstance.status === 'stopped' || currentInstance.status === 'stopping'"
                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
                   >
-                    Stop VPN
+                    Stop Instance
                   </button>
                   <button 
                     @click="refreshStatus"
@@ -88,6 +108,7 @@
 <script>
 import { vpnService } from '../services/vpnService'
 import { authService } from '../services/authService'
+import { awsInstanceService } from '../services/awsInstanceService'
 import AwsInstanceManager from './aws/AwsInstanceManager.vue'
 
 export default {
@@ -102,7 +123,9 @@ export default {
   },
   data() {
     return {
-      status: 'unknown',
+      instances: [],
+      selectedInstanceId: '',
+      currentInstance: null,
       message: '',
       messageType: 'success'
     }
@@ -113,17 +136,47 @@ export default {
     }
   },
   mounted() {
-    this.refreshStatus()
+    this.loadInstances()
   },
   methods: {
     toggleTheme() {
       const newTheme = this.theme === 'dark' ? 'light' : 'dark'
       this.$emit('theme-changed', newTheme)
     },
-    async refreshStatus() {
+    async loadInstances() {
       try {
-        const response = await vpnService.getStatus()
-        this.status = response.state
+        const data = await awsInstanceService.getUserInstances()
+        this.instances = data
+        if (data.length > 0 && !this.selectedInstanceId) {
+          this.selectedInstanceId = data[0].id
+          this.currentInstance = data[0]
+        }
+      } catch (error) {
+        this.message = `Error loading instances: ${error.response?.data?.error || error.message}`
+        this.messageType = 'error'
+      }
+    },
+    onInstanceChange() {
+      if (this.selectedInstanceId) {
+        this.currentInstance = this.instances.find(instance => instance.id == this.selectedInstanceId)
+        this.refreshStatus()
+      } else {
+        this.currentInstance = null
+      }
+    },
+    async refreshStatus() {
+      if (!this.currentInstance) {
+        this.message = 'Please select an instance first'
+        this.messageType = 'error'
+        return
+      }
+      
+      try {
+        const response = await vpnService.getStatus({
+          instanceId: this.currentInstance.instanceId,
+          region: this.currentInstance.region
+        })
+        this.currentInstance.status = response.state
         this.message = ''
       } catch (error) {
         this.message = `Error: ${error.response?.data?.error || error.message}`
@@ -131,8 +184,17 @@ export default {
       }
     },
     async startInstance() {
+      if (!this.currentInstance) {
+        this.message = 'Please select an instance first'
+        this.messageType = 'error'
+        return
+      }
+      
       try {
-        await vpnService.startInstance()
+        await vpnService.startInstance({
+          instanceId: this.currentInstance.instanceId,
+          region: this.currentInstance.region
+        })
         this.message = 'Start command sent successfully'
         this.messageType = 'success'
         // Refresh status after a short delay
@@ -143,8 +205,17 @@ export default {
       }
     },
     async stopInstance() {
+      if (!this.currentInstance) {
+        this.message = 'Please select an instance first'
+        this.messageType = 'error'
+        return
+      }
+      
       try {
-        await vpnService.stopInstance()
+        await vpnService.stopInstance({
+          instanceId: this.currentInstance.instanceId,
+          region: this.currentInstance.region
+        })
         this.message = 'Stop command sent successfully'
         this.messageType = 'success'
         // Refresh status after a short delay

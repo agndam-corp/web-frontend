@@ -2,10 +2,24 @@
 import apiClient from './api';
 
 export const vpnService = {
-  // Get VPN instance status
-  async getStatus() {
+  // Get VPN instance status - accepts optional params for specific instance
+  async getStatus(params = {}) {
     try {
-      const response = await apiClient.get('/status');
+      let url = '/status';
+      const queryParams = [];
+      
+      if (params.instanceId) {
+        queryParams.push(`instanceId=${encodeURIComponent(params.instanceId)}`);
+      }
+      if (params.region) {
+        queryParams.push(`region=${encodeURIComponent(params.region)}`);
+      }
+      
+      if (queryParams.length > 0) {
+        url += '?' + queryParams.join('&');
+      }
+      
+      const response = await apiClient.get(url);
       console.log('VPN service: Status retrieved:', response.data);
       return response.data;
     } catch (error) {
@@ -15,9 +29,13 @@ export const vpnService = {
   },
 
   // Start VPN instance
-  async startInstance() {
+  async startInstance(params = {}) {
     try {
-      const response = await apiClient.post('/start');
+      const payload = {};
+      if (params.instanceId) payload.instanceId = params.instanceId;
+      if (params.region) payload.region = params.region;
+      
+      const response = await apiClient.post('/start', payload);
       console.log('VPN service: Start instance successful:', response.data);
       return response.data;
     } catch (error) {
@@ -27,9 +45,13 @@ export const vpnService = {
   },
 
   // Stop VPN instance
-  async stopInstance() {
+  async stopInstance(params = {}) {
     try {
-      const response = await apiClient.post('/stop');
+      const payload = {};
+      if (params.instanceId) payload.instanceId = params.instanceId;
+      if (params.region) payload.region = params.region;
+      
+      const response = await apiClient.post('/stop', payload);
       console.log('VPN service: Stop instance successful:', response.data);
       return response.data;
     } catch (error) {
