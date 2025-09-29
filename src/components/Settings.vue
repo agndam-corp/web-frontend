@@ -103,15 +103,21 @@ export default {
   methods: {
     async loadUserInfo() {
       try {
-        // Get user info from local storage since we don't have a dedicated API endpoint
+        // Get user info from auth service
         this.user = {
           username: authService.getUsername(),
           role: authService.getUserRole(),
-          email: 'user@example.com', // This would come from the API in a real implementation
+          email: localStorage.getItem('user_email') || 'N/A', // Would come from API response
           createdAt: localStorage.getItem('user_created_at') || new Date().toISOString() // Would come from API
         }
       } catch (error) {
         console.error('Error loading user info:', error)
+        this.user = {
+          username: authService.getUsername(),
+          role: authService.getUserRole(),
+          email: 'N/A',
+          createdAt: 'N/A'
+        }
       }
     },
     formatDate(dateString) {

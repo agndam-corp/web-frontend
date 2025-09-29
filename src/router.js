@@ -36,16 +36,19 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const accessToken = localStorage.getItem('access_token')
   
-  // If trying to access main app without auth, redirect to login
-  if (to.name === 'MainApp' && !accessToken) {
+  // Protected routes (require authentication)
+  const protectedRoutes = ['MainApp', 'Settings']
+  
+  if (protectedRoutes.includes(to.name) && !accessToken) {
+    // If trying to access protected route without auth, redirect to login
     next({ name: 'Login' })
   } 
-  // If trying to access login while authenticated and going to root, redirect to main app
-  else if ((to.name === 'Login' || to.name === 'Register') && accessToken && to.path === '/') {
+  else if ((to.name === 'Login' || to.name === 'Register') && accessToken) {
+    // If authenticated and trying to access login/register, redirect to main app
     next({ name: 'MainApp' })
-  } 
-  // Otherwise, proceed normally
+  }
   else {
+    // Otherwise, proceed normally
     next()
   }
 })

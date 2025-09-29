@@ -257,32 +257,7 @@ export default {
   border-radius: 0.5rem;
 }
 
-.bg-green-100 {
-  background-color: #48bb78;
-  opacity: 0.2;
-}
 
-.text-green-800 {
-  color: #48bb78;
-}
-
-.bg-red-100 {
-  background-color: #e53e3e;
-  opacity: 0.2;
-}
-
-.text-red-800 {
-  color: #e53e3e;
-}
-
-.bg-yellow-100 {
-  background-color: #ed8936;
-  opacity: 0.2;
-}
-
-.text-yellow-800 {
-  color: #ed8936;
-}
 
 .bg-green-600 {
   background-color: #48bb78;
