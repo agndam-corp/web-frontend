@@ -123,8 +123,7 @@ import AwsInstanceManager from './aws/AwsInstanceManager.vue'
 
 export default {
   components: {
-    AwsInstanceManager,
-    SettingsView
+    AwsInstanceManager
   },
   props: {
     theme: {
@@ -278,11 +277,33 @@ export default {
   border: 1px solid #cbd5e0;
 }
 
-.shadow.overflow-hidden.sm\:rounded-lg {
+.shadow.overflow-hidden.sm\\:rounded-lg {
   border-radius: 0.5rem;
 }
 
+.bg-green-100 {
+  background-color: #48bb78;
+}
 
+.text-green-800 {
+  color: #48bb78;
+}
+
+.bg-red-100 {
+  background-color: #e53e3e;
+}
+
+.text-red-800 {
+  color: #e53e3e;
+}
+
+.bg-yellow-100 {
+  background-color: #ed8936;
+}
+
+.text-yellow-800 {
+  color: #ed8936;
+}
 
 .bg-green-600 {
   background-color: #48bb78;
