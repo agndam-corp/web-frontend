@@ -5,17 +5,17 @@ export const vpnService = {
   // Get VPN instance status - accepts optional params for specific instance
   async getStatus(params = {}) {
     try {
+      // If no params provided (when called from MainApp initially), call with no params
+      // If params provided (when called for specific instance), use query parameters
       let url = '/status';
-      const queryParams = [];
-      
-      if (params.instanceId) {
-        queryParams.push(`instanceId=${encodeURIComponent(params.instanceId)}`);
-      }
-      if (params.region) {
-        queryParams.push(`region=${encodeURIComponent(params.region)}`);
-      }
-      
-      if (queryParams.length > 0) {
+      if (params.instanceId || params.region) {
+        const queryParams = [];
+        if (params.instanceId) {
+          queryParams.push(`instanceId=${encodeURIComponent(params.instanceId)}`);
+        }
+        if (params.region) {
+          queryParams.push(`region=${encodeURIComponent(params.region)}`);
+        }
         url += '?' + queryParams.join('&');
       }
       
