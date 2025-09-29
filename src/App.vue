@@ -1,12 +1,7 @@
 <template>
   <div id="app" :class="themeClass">
-    <Login v-if="!isAuthenticated" @login-success="onLoginSuccess" />
-    <MainApp v-else-if="$route.name === 'MainApp'" :theme="theme" @theme-changed="changeTheme" />
-    <Settings v-else-if="$route.name === 'Settings' && isAuthenticated" :theme="theme" @theme-changed="changeTheme" />
-    <div v-else-if="isAuthenticated && $route.name !== 'MainApp'" class="p-4">
-      <h2>Page Not Found</h2>
-      <p>The requested page could not be found.</p>
-    </div>
+    <Login v-if="!isAuthenticated && $route.name !== 'MainApp' && $route.name !== 'Settings'" @login-success="onLoginSuccess" />
+    <router-view v-else :theme="theme" @theme-changed="changeTheme" />
   </div>
 </template>
 
@@ -18,9 +13,7 @@ import Settings from './components/Settings.vue'
 export default {
   name: 'App',
   components: {
-    Login,
-    MainApp,
-    Settings
+    Login
   },
   data() {
     return {
