@@ -18,17 +18,22 @@
         </div>
 
         <!-- Error message -->
-        <div v-if="errorMessage" class="mb-4 p-4 rounded-md bg-red-50 text-red-800">
+        <div v-if="errorMessage" class="mb-4 p-4 rounded-md" 
+             :class="theme === 'dark' ? 'bg-red-900 text-red-100' : 'bg-red-50 text-red-800'">
           <p>{{ errorMessage }}</p>
         </div>
         
         <!-- Notification message -->
         <div v-if="message" class="mb-4 p-4 rounded-md" 
              :class="{
-               'bg-green-50 text-green-800': messageType === 'success',
-               'bg-red-50 text-red-800': messageType === 'error',
-               'bg-yellow-50 text-yellow-800': messageType === 'warning',
-               'bg-blue-50 text-blue-800': messageType === 'info'
+               'bg-green-900 text-green-100': messageType === 'success' && theme === 'dark',
+               'bg-green-50 text-green-800': messageType === 'success' && theme === 'light',
+               'bg-red-900 text-red-100': messageType === 'error' && theme === 'dark',
+               'bg-red-50 text-red-800': messageType === 'error' && theme === 'light',
+               'bg-yellow-900 text-yellow-100': messageType === 'warning' && theme === 'dark',
+               'bg-yellow-50 text-yellow-800': messageType === 'warning' && theme === 'light',
+               'bg-blue-900 text-blue-100': messageType === 'info' && theme === 'dark',
+               'bg-blue-50 text-blue-800': messageType === 'info' && theme === 'light'
              }">
           <p>{{ message }}</p>
         </div>
