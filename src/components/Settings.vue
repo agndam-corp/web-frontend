@@ -1,7 +1,15 @@
 <template>
   <div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
     <div class="px-4 py-6 sm:px-0">
-      <h2 class="text-2xl font-bold mb-6" :class="theme === 'dark' ? 'text-white' : 'text-gray-900'">Settings</h2>
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold" :class="theme === 'dark' ? 'text-white' : 'text-gray-900'">Settings</h2>
+        <router-link 
+          to="/"
+          class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Back to Main
+        </router-link>
+      </div>
       
       <!-- User Information Section -->
       <div class="shadow overflow-hidden sm:rounded-lg mb-8" :class="theme === 'dark' ? 'bg-gray-800' : 'bg-white'">
