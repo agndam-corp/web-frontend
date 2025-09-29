@@ -1,38 +1,41 @@
 <template>
   <div id="app" :class="themeClass">
     <Login v-if="!isAuthenticated" @login-success="onLoginSuccess" />
-    <MainApp v-else :theme="theme" @theme-changed="changeTheme" />
+    <MainApp v-else-if="$route.name === 'MainApp'" :theme="theme" @theme-changed="changeTheme" />
+    <Settings v-else-if="$route.name === 'Settings' && isAuthenticated" :theme="theme" @theme-changed="changeTheme" />
+    <div v-else-if="isAuthenticated && $route.name !== 'MainApp'" class="p-4">
+      <h2>Page Not Found</h2>
+      <p>The requested page could not be found.</p>
+    </div>
   </div>
 </template>
 
 <script>
 import Login from './components/Login.vue'
 import MainApp from './components/MainApp.vue'
+import Settings from './components/Settings.vue'
 
 export default {
   name: 'App',
   components: {
     Login,
-    MainApp
+    MainApp,
+    Settings
   },
   data() {
     return {
-      isAuthenticated: false,
       theme: 'dark' // Default to dark theme
     }
   },
   computed: {
     themeClass() {
       return `theme-${this.theme}`
+    },
+    isAuthenticated() {
+      return !!localStorage.getItem('access_token')
     }
   },
   mounted() {
-    // Check if user is already authenticated via JWT access token
-    const accessToken = localStorage.getItem('access_token')
-    if (accessToken) {
-      this.isAuthenticated = true
-    }
-    
     // Load theme from localStorage or default to dark
     const savedTheme = localStorage.getItem('theme')
     if (savedTheme) {
@@ -41,9 +44,8 @@ export default {
   },
   methods: {
     onLoginSuccess(loginData) {
-      // Set the authentication status and update any necessary data
-      this.isAuthenticated = true
       // Optionally store additional data if needed
+      // Authentication status is checked via computed property
     },
     changeTheme(newTheme) {
       this.theme = newTheme
