@@ -101,7 +101,44 @@
         </div>
       </div>
     </main>
-    <aws-instance-manager :theme="theme" />
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <div class="border-b border-gray-200">
+        <nav class="-mb-px flex space-x-8">
+          <button
+            @click="currentView = 'instances'"
+            :class="[
+              currentView === 'instances'
+                ? theme === 'dark' ? 'border-indigo-500 text-indigo-400' : 'border-indigo-500 text-indigo-600'
+                : theme === 'dark' ? 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+              'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
+            ]"
+          >
+            AWS Instance Management
+          </button>
+          <button
+            @click="currentView = 'settings'"
+            :class="[
+              currentView === 'settings'
+                ? theme === 'dark' ? 'border-indigo-500 text-indigo-400' : 'border-indigo-500 text-indigo-600'
+                : theme === 'dark' ? 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+              'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
+            ]"
+          >
+            Settings
+          </button>
+        </nav>
+      </div>
+      
+      <!-- Instance Management View -->
+      <div v-if="currentView === 'instances'">
+        <aws-instance-manager :theme="theme" />
+      </div>
+      
+      <!-- Settings View -->
+      <div v-if="currentView === 'settings'">
+        <settings-view :theme="theme" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -110,10 +147,12 @@ import { vpnService } from '../services/vpnService'
 import { authService } from '../services/authService'
 import { awsInstanceService } from '../services/awsInstanceService'
 import AwsInstanceManager from './aws/AwsInstanceManager.vue'
+import SettingsView from './Settings.vue'
 
 export default {
   components: {
-    AwsInstanceManager
+    AwsInstanceManager,
+    SettingsView
   },
   props: {
     theme: {
@@ -127,7 +166,8 @@ export default {
       selectedInstanceId: '',
       currentInstance: null,
       message: '',
-      messageType: 'success'
+      messageType: 'success',
+      currentView: 'instances'  // Default to instances view
     }
   },
   computed: {
