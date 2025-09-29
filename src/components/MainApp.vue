@@ -81,14 +81,19 @@
         </div>
       </div>
     </main>
+    <aws-instance-manager :theme="theme" />
   </div>
 </template>
 
 <script>
 import { vpnService } from '../services/vpnService'
 import { authService } from '../services/authService'
+import AwsInstanceManager from './aws/AwsInstanceManager.vue'
 
 export default {
+  components: {
+    AwsInstanceManager
+  },
   props: {
     theme: {
       type: String,
